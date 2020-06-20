@@ -1,0 +1,6 @@
+vendor/
+.idea/
+build/
+dev.php
+.phplint-cache
+tmp/

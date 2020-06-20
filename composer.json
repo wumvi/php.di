@@ -1,0 +1,19 @@
+{
+    "name": "wumvi/di",
+    "autoload": {
+        "psr-4": {
+            "Wumvi\\DI\\": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "VladKopalov",
+            "email": "vladkop@mail.ru"
+        }
+    ],
+    "require": {
+        "symfony/dependency-injection": "^5.1",
+        "symfony/config": "^5.1",
+        "symfony/yaml": "^5.1"
+    }
+}

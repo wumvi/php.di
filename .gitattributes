@@ -1,0 +1,10 @@
+* text eol=lf
+/phpunit              export-ignore
+/phpunit.xml        export-ignore
+/dev export-ignore
+/.travis.yml export-ignore
+/bootstrap.php export-ignore
+/docker-compose.yml export-ignore
+/phpstan.neon export-ignore
+/README.md export-ignore
+/ruleset.xml export-ignore
