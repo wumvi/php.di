@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Wumvi\Di;
+namespace Wumvi\DI;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Container;
@@ -9,25 +9,36 @@ use \Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use \Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use \Symfony\Component\Dotenv\Dotenv;
 
 class DI
 {
-    public const DEFAULT_FILE_CONFIG = '../../conf/services.yml';
     private ?Container $di = null;
 
-    public function getDi(
-        string $file = self::DEFAULT_FILE_CONFIG,
-        bool $isDebug = true,
-        string $envFile = ''
-    ): Container {
-        $envHash = 'NoEnv';
+    public static function getCacheFilename(string $envHash): string
+    {
+        return $tmpCache = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'SymfonyDiCacheContainer-' . $envHash . '.php';
+    }
+
+    public static function getEnvHash(string $envFile): string
+    {
+        $envHash = 'NoEnvFile';
         if (!empty($envFile) && is_file($envFile)) {
             (new Dotenv())->loadEnv($envFile);
             $envHash = md5_file($envFile);
         }
+
+        return $envHash;
+    }
+
+    public function getDi(
+        string $file,
+        string $envFile = '',
+        bool $isDebug = true
+    ): Container {
         if ($this->di === null) {
-            $tmpCache = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'SymfonyDiCacheContainer-' . $envHash . '.php';
+            $tmpCache = self::getCacheFilename(self::getEnvHash($envFile));
             $containerConfigCache = new ConfigCache($tmpCache, $isDebug);
             if (!$containerConfigCache->isFresh()) {
                 $containerBuilder = new ContainerBuilder();
