@@ -9,7 +9,6 @@ use \Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use \Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use \Symfony\Component\Dotenv\Dotenv;
 
 class DI
@@ -35,6 +34,7 @@ class DI
     public function getDi(
         string $file,
         string $envFile = '',
+        bool $resolveEnvPlaceholders = true,
         bool $isDebug = true
     ): Container {
         if ($this->di === null) {
@@ -45,7 +45,7 @@ class DI
 
                 $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__));
                 $loader->load($file);
-                $containerBuilder->compile(true);
+                $containerBuilder->compile($resolveEnvPlaceholders);
 
                 $dumper = new PhpDumper($containerBuilder);
                 $options = [
