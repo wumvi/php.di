@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Wumvi\DI;
 
+use Exception;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Container;
 use \Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,26 +12,42 @@ use \Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 use \Symfony\Component\Dotenv\Dotenv;
 
-class DI
+class DiBuilder
 {
     private ?Container $di = null;
 
-    public static function getCacheFilename(string $envHash): string
+    public static function makeCacheFilename(string $envHash, ?string $tmpDir = null): string
     {
-        return $tmpCache = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'SymfonyDiCacheContainer-' . $envHash . '.php';
+        $tmpDir = $tmpDir ?: sys_get_temp_dir();
+
+        return $tmpDir . DIRECTORY_SEPARATOR . 'SymfonyDiCacheContainer-' . $envHash . '.php';
     }
 
     public static function getEnvHash(string $envFile): string
     {
-        $envHash = 'NoEnvFile';
         if (!empty($envFile) && is_file($envFile)) {
             (new Dotenv())->loadEnv($envFile);
-            $envHash = md5_file($envFile);
+            return md5_file($envFile);
         }
 
-        return $envHash;
+        return 'NoEnvFile';
     }
 
+    public static function getCacheFile(string $envFile): string
+    {
+        return self::makeCacheFilename(self::getEnvHash($envFile));
+    }
+
+    /**
+     * @param string $file
+     * @param string $envFile
+     * @param bool $resolveEnvPlaceholders
+     * @param bool $isDebug
+     *
+     * @return Container
+     *
+     * @throws Exception
+     */
     public function getDi(
         string $file,
         string $envFile = '',
@@ -38,7 +55,7 @@ class DI
         bool $isDebug = true
     ): Container {
         if ($this->di === null) {
-            $tmpCache = self::getCacheFilename(self::getEnvHash($envFile));
+            $tmpCache = self::getCacheFile($envFile);
             $containerConfigCache = new ConfigCache($tmpCache, $isDebug);
             if (!$containerConfigCache->isFresh()) {
                 $containerBuilder = new ContainerBuilder();
@@ -65,5 +82,10 @@ class DI
         }
 
         return $this->di;
+    }
+
+    public function clear(): void
+    {
+        $this->di = null;
     }
 }

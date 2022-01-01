@@ -3,4 +3,4 @@ vendor/
 build/
 dev.php
 .phplint-cache
-tmp/
+.phpunit.result.cache

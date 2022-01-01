@@ -1,0 +1,3 @@
+parameters:
+  test_param: 'test-param-value2'
+  env_value: '%env(DD)%'
