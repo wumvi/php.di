@@ -1,22 +1,22 @@
 {
-    "name": "wumvi/di",
+    "name": "wumvi/php.di",
     "autoload": {
         "psr-4": {
             "Wumvi\\DI\\": "src"
         }
     },
     "require": {
-        "symfony/dependency-injection": "v6.0.2",
-        "symfony/config": "v6.0.2",
-        "symfony/yaml": "v6.0.2",
-        "symfony/dotenv": "v6.0.2"
+        "symfony/dependency-injection": "^v7.0.1",
+        "symfony/config": "^v7.0.0",
+        "symfony/yaml": "^v7.0.0",
+        "symfony/dotenv": "^v7.0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "9.5.11",
-        "squizlabs/php_codesniffer": "3.6.2",
-        "overtrue/phplint": "4.1.0",
-        "phpstan/phpstan": "1.3.0",
-        "phan/phan": "5.3.1"
+        "phpunit/phpunit": "10.5.3",
+        "squizlabs/php_codesniffer": "3.8.0",
+        "overtrue/phplint": "9.0.6",
+        "phpstan/phpstan": "1.10.50",
+        "phan/phan": "5.4.2"
     },
     "archive": {
         "exclude": ["phpunit", "bootstrap.php", "phpstan.neon", "phpunit.xml", "README.md", "ruleset.xml", ".phpstorm.meta.php", ".travis.yml", ".phplint.yml", ".gitignore"]
@@ -26,7 +26,6 @@
             "phpstan analyze -c phpstan.neon"
         ],
         "phpunit": [
-
             "XDEBUG_MODE=coverage phpunit"
         ],
         "phplint": [

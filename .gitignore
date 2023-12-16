@@ -4,3 +4,4 @@ build/
 dev.php
 .phplint-cache
 .phpunit.result.cache
+composer.phar
