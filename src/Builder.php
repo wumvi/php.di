@@ -94,6 +94,6 @@ class Builder
 
     public static function isDev(): bool
     {
-        return $_SERVER['APP_ENV'] ?? '' === 'dev';
+        return ($_SERVER['APP_ENV'] ?? '') === 'dev';
     }
 }
