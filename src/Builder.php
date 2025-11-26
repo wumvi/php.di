@@ -13,24 +13,24 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class Builder
 {
-    public const string SERVICE_FILE = 'app/config/services.yml';
-    public const string ENV_FILE = 'app/.env';
-    public const string NO_ENV = 'NoEnvFile';
+    public const string PREFIX_FPM = 'fpm';
+    public const string PREFIX_CLI = 'cli';
 
     private ?Container $di = null;
     private static ?Builder $diSelf = null;
 
-    public static function getCacheFilename(string $envHash = ''): string
+    public static function getCacheFilename(string $envHash, string $cacheFilenamePrefix): string
     {
-        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'SymfonyDiCacheContainer-' . $envHash . '.php';
+        return sys_get_temp_dir() . DIRECTORY_SEPARATOR
+            . 'SymfonyDiCacheContainer-' . $envHash . '-' . $cacheFilenamePrefix . '.php';
     }
 
     public static function getEnvHash(string $envFile): string
     {
-        $envHash = self::NO_ENV;
+        $envHash = 'NoEnvFile';
         if (!empty($envFile) && is_file($envFile)) {
-            (new Dotenv())->loadEnv($envFile);
-            $envHash = md5_file($envFile) ?: self::NO_ENV;
+            new Dotenv()->loadEnv($envFile);
+            $envHash = md5_file($envFile) ?: $envHash;
         }
 
         return $envHash;
@@ -38,12 +38,13 @@ class Builder
 
     public function getDi(
         string $file,
+        string $cacheFilenamePrefix,
         string $envFile = '',
-        bool $resolveEnvPlaceholders = true,
-        bool $isDebug = true
+        bool   $resolveEnvPlaceholders = true,
+        bool   $isDebug = true,
     ): Container {
         if ($this->di === null) {
-            $tmpCache = self::getCacheFilename(self::getEnvHash($envFile));
+            $tmpCache = self::getCacheFilename(self::getEnvHash($envFile), $cacheFilenamePrefix);
             $containerConfigCache = new ConfigCache($tmpCache, $isDebug);
             if (!$containerConfigCache->isFresh()) {
                 $containerBuilder = new ContainerBuilder();
@@ -59,10 +60,9 @@ class Builder
                     'debug' => $isDebug,
                     'class' => 'SymfonyDiCacheContainerClass',
                 ];
-                $containerConfigCache->write(
-                    $dumper->dump($options),
-                    $containerBuilder->getResources()
-                );
+                /** @var string $dump */
+                $dump = $dumper->dump($options);
+                $containerConfigCache->write($dump, $containerBuilder->getResources());
             }
 
             include $tmpCache;
@@ -73,10 +73,11 @@ class Builder
     }
 
     public static function makeDi(
+        string $cacheFilenamePrefix = self::PREFIX_FPM,
         string $root = '/',
-        bool $resolveEnvPlaceholders = true,
-        string $configFile = self::SERVICE_FILE,
-        string $envFile = self::ENV_FILE
+        bool   $resolveEnvPlaceholders = true,
+        string $configFile = 'app/config/services.yml',
+        string $envFile = 'app/config/.env'
     ): Container {
         if (self::$diSelf === null) {
             self::$diSelf = new self();
@@ -86,6 +87,7 @@ class Builder
 
         return self::$diSelf->getDi(
             $root . $configFile,
+            $cacheFilenamePrefix,
             $root . $envFile,
             $resolveEnvPlaceholders,
             self::isDev()
@@ -94,6 +96,6 @@ class Builder
 
     public static function isDev(): bool
     {
-        return ($_SERVER['APP_ENV'] ?? '') === 'dev';
+        return ($_SERVER['APP_ENV'] ?? 'prod') === 'dev';
     }
 }

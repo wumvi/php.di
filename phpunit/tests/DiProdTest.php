@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 use Wumvi\DI\Builder;
 
 /**
- * @runTestsInSeparateProcesses
+ * #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
  */
 class DiProdTest extends TestCase
 {
@@ -14,7 +14,7 @@ class DiProdTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $file = Builder::getCacheFilename(self::ENV_FILE);
+        $file = Builder::getCacheFilename(Builder::getEnvHash(self::ENV_FILE), Builder::PREFIX_CLI);
         if (is_file($file)) {
             unlink($file);
         }
@@ -23,12 +23,11 @@ class DiProdTest extends TestCase
     /**
      * @return void
      * @throws Exception
-     * @runTestsInSeparateProcesses
      */
     public function testCacheDi(): void
     {
         $diBuilder = new Builder();
-        $di = $diBuilder->getDi(self::CONFIG_FILE, self::ENV_FILE, true, false);
+        $di = $diBuilder->getDi(self::CONFIG_FILE, Builder::PREFIX_CLI, self::ENV_FILE, true, false);
         $this->assertEquals('test-param-value2', $di->getParameter('test_param'), 'get prod cache di param');
         $this->assertEquals('1', $di->getParameter('env_value'), 'get prod cache di env');
     }

@@ -1,6 +1,7 @@
 parameters:
     level: 7
-    checkGenericClassInNonGenericObjectType: false
-    checkMissingIterableValueType: false
+    ignoreErrors:
+        - '#Instantiated class SymfonyDiCacheContainerClass not found\.#'
+        - '# does not accept SymfonyDiCacheContainerClass\.#'
     paths:
         - src/

@@ -1,0 +1,12 @@
+services:
+  wm-php-di:
+    container_name: wm.php.di
+    hostname: wm.php.di
+    build:
+      dockerfile: ./dev/Dockerfile
+      context: ./
+    network_mode: host
+    working_dir: /app/
+    command: "/usr/bin/runsvdir -P /etc/service"
+    volumes:
+      - './:/app/'
