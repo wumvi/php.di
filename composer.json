@@ -1,6 +1,6 @@
 {
     "name": "wumvi/php.di",
-    "version": "1.0.1",
+    "version": "1.3.2",
     "autoload": {
         "psr-4": {
             "Wumvi\\DI\\": "src"
